@@ -8,7 +8,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
   <style>
-    /* ===================== DESIGN TOKENS ===================== */
+    /* ===================== TOKENS DE DESIGN ===================== */
     :root {
       --bg-primary: #0d0f14;
       --bg-secondary: #13151c;
@@ -45,7 +45,7 @@
       overflow-x: hidden;
     }
 
-    /* ===================== BACKGROUND ===================== */
+    /* ===================== FUNDO (BACKGROUND) ===================== */
     .bg-glow {
       position: fixed;
       inset: 0;
@@ -121,7 +121,7 @@
       line-height: 1.6;
     }
 
-    /* ===================== GRID ===================== */
+    /* ===================== GRADE (GRID) ===================== */
     .editor-grid {
       display: grid;
       grid-template-columns: 1fr 1fr;
@@ -145,7 +145,7 @@
       }
     }
 
-    /* ===================== PANEL / CARD ===================== */
+    /* ===================== PAINEL / CARD ===================== */
     .panel {
       background: var(--bg-card);
       border: 1px solid var(--border);
@@ -233,7 +233,7 @@
     .output-pre::-webkit-scrollbar-track { background: transparent; }
     .output-pre::-webkit-scrollbar-thumb { background: var(--border); border-radius: 99px; }
 
-    /* ===================== CHAR COUNT ===================== */
+    /* ===================== CONTAGEM DE CARACTERES ===================== */
     .char-count {
       padding: 8px 20px;
       font-size: 11px;
@@ -242,7 +242,7 @@
       text-align: right;
     }
 
-    /* ===================== COPY BUTTON ===================== */
+    /* ===================== BOTÃO DE COPIAR ===================== */
     .btn-copy {
       display: inline-flex;
       align-items: center;
@@ -318,7 +318,7 @@
     @keyframes toastIn  { from { opacity:0; transform:translateY(16px); } to { opacity:1; transform:translateY(0); } }
     @keyframes toastOut { from { opacity:1; transform:translateY(0); } to { opacity:0; transform:translateY(16px); } }
 
-    /* ===================== CHEAT SHEET ===================== */
+    /* ===================== FOLHA DE COLA (CHEAT SHEET) ===================== */
     .cheatsheet {
       margin-top: 32px;
       background: var(--bg-card);
@@ -378,7 +378,7 @@
     .badge-wa { background: rgba(37,211,102,0.15); color: var(--whatsapp-green); }
     .badge-gc { background: rgba(26,115,232,0.15); color: var(--gchat-light); }
 
-    /* ===================== FOOTER ===================== */
+    /* ===================== RODAPÉ (FOOTER) ===================== */
     footer {
       text-align: center;
       padding: 40px 0 0;
@@ -480,9 +480,9 @@ Exemplos:
       <div class="char-count" id="gcCharCount">0 caracteres</div>
     </div>
 
-  </div><!-- /editor-grid -->
+  </div><!-- /editor-grid (grade-do-editor) -->
 
-  <!-- CHEAT SHEET -->
+  <!-- REFERÊNCIA RÁPIDA (CHEAT SHEET) -->
   <div class="cheatsheet">
     <h2>📖 Referência Rápida</h2>
     <div class="cheatsheet-grid">
@@ -584,97 +584,97 @@ Exemplos:
 
 </div><!-- /container -->
 
-<!-- TOAST CONTAINER -->
+<!-- CONTAINER DE NOTIFICAÇÕES (TOAST) -->
 <div class="toast-container" id="toastContainer"></div>
 
 <script>
-  // ===================== CONVERSION LOGIC =====================
+  // ===================== LÓGICA DE CONVERSÃO =====================
 
   /**
-   * Converts Markdown input to WhatsApp-compatible format.
-   * @param {string} input - Raw Markdown string.
-   * @returns {string} WhatsApp-formatted string.
+   * Converte a entrada Markdown para o formato compatível com WhatsApp.
+   * @param {string} input - String Markdown bruta.
+   * @returns {string} String formatada para WhatsApp.
    */
   function convertToWhatsApp(input) {
     let output = input;
 
-    // Code blocks (must run before inline code)
+    // Blocos de código (deve rodar antes do código inline)
     output = output.replace(/```[\w]*\n?([\s\S]*?)```/g, '```$1```');
 
-    // Headings: # Title -> *TITLE*
+    // Títulos: # Título -> *TÍTULO*
     output = output.replace(/^#{1,6}\s+(.+)$/gm, (_, text) => `*${text.toUpperCase()}*`);
 
-    // Bold: **text** or __text__ -> *text*
-    // Use placeholder to prevent italic regex from consuming bold markers
+    // Negrito: **texto** ou __texto__ -> *texto*
+    // Usa um marcador temporário para evitar que o regex de itálico consuma os marcadores de negrito
     output = output.replace(/\*\*(.+?)\*\*/g, '\x00BOLD\x00$1\x00BOLD\x00');
     output = output.replace(/__(.+?)__/g, '\x00BOLD\x00$1\x00BOLD\x00');
 
-    // Italic: *text* or _text_ -> _text_
+    // Itálico: *texto* ou _texto_ -> _texto_
     output = output.replace(/(?<!\*)\*(?!\*)(.+?)(?<!\*)\*(?!\*)/g, '_$1_');
     output = output.replace(/(?<!_)_(?!_)(.+?)(?<!_)_(?!_)/g, '_$1_');
 
-    // Restore bold placeholders -> *text*
+    // Restaura os marcadores de negrito -> *texto*
     output = output.replace(/\x00BOLD\x00(.+?)\x00BOLD\x00/g, '*$1*');
 
-    // Strikethrough: ~~text~~ -> ~text~
+    // Tachado: ~~texto~~ -> ~text~
     output = output.replace(/~~(.+?)~~/g, '~$1~');
 
-    // Unordered lists: - item or * item -> - item (WhatsApp native format)
+    // Listas não ordenadas: - item ou * item -> - item (formato nativo do WhatsApp)
     output = output.replace(/^[\-\*]\s+(.+)$/gm, '- $1');
 
-    // Ordered lists: 1. item -> 1. item (already supported, keep as is)
+    // Listas ordenadas: 1. item -> 1. item (já suportado, mantém como está)
 
-    // Horizontal rule: --- or *** -> ————————
+    // Linha horizontal: --- ou *** -> ————————
     output = output.replace(/^[-\*]{3,}$/gm, '————————');
 
-    // Blockquote: > text -> > text (WhatsApp doesn't have quotes, keep prefix)
-    // (no change needed, keep the > prefix as visual indicator)
+    // Citação: > texto -> > texto (WhatsApp não possui citações nativas, mantém o prefixo)
+    // (nenhuma alteração necessária, mantém o prefixo > como indicador visual)
 
     return output.trim();
   }
 
   /**
-   * Converts Markdown input to Google Chat-compatible format.
-   * @param {string} input - Raw Markdown string.
-   * @returns {string} Google Chat-formatted string.
+   * Converte a entrada Markdown para o formato compatível com Google Chat.
+   * @param {string} input - String Markdown bruta.
+   * @returns {string} String formatada para Google Chat.
    */
   function convertToGoogleChat(input) {
     let output = input;
 
-    // Code blocks (must run before inline code)
+    // Blocos de código (deve rodar antes do código inline)
     output = output.replace(/```[\w]*\n?([\s\S]*?)```/g, '```$1```');
 
-    // Headings: # Title -> *TITLE*
+    // Títulos: # Título -> *TÍTULO*
     output = output.replace(/^#{1,6}\s+(.+)$/gm, (_, text) => `*${text.toUpperCase()}*`);
 
-    // Bold: **text** or __text__ -> *text*
-    // Use placeholder to prevent italic regex from consuming bold markers
+    // Negrito: **texto** ou __texto__ -> *texto*
+    // Usa um marcador temporário para evitar que o regex de itálico consuma os marcadores de negrito
     output = output.replace(/\*\*(.+?)\*\*/g, '\x00BOLD\x00$1\x00BOLD\x00');
     output = output.replace(/__(.+?)__/g, '\x00BOLD\x00$1\x00BOLD\x00');
 
-    // Italic: *text* or _text_ -> _text_
+    // Itálico: *texto* ou _texto_ -> _texto_
     output = output.replace(/(?<!\*)\*(?!\*)(.+?)(?<!\*)\*(?!\*)/g, '_$1_');
     output = output.replace(/(?<!_)_(?!_)(.+?)(?<!_)_(?!_)/g, '_$1_');
 
-    // Restore bold placeholders -> *text*
+    // Restaura os marcadores de negrito -> *texto*
     output = output.replace(/\x00BOLD\x00(.+?)\x00BOLD\x00/g, '*$1*');
 
-    // Strikethrough: ~~text~~ -> ~text~
+    // Tachado: ~~texto~~ -> ~text~
     output = output.replace(/~~(.+?)~~/g, '~$1~');
 
-    // Unordered lists: - item or * item -> - item (Google Chat native format)
+    // Listas não ordenadas: - item ou * item -> - item (formato nativo do Google Chat)
     output = output.replace(/^[\-\*]\s+(.+)$/gm, '- $1');
 
-    // Horizontal rule: --- -> ————————
+    // Linha horizontal: --- -> ————————
     output = output.replace(/^[-\*]{3,}$/gm, '————————');
 
-    // Blockquote: keep > prefix
-    // (Google Chat doesn't support quotes natively, keep visual >)
+    // Citação: mantém o prefixo >
+    // (Google Chat não suporta citações nativamente, mantém o > visual)
 
     return output.trim();
   }
 
-  // ===================== UI HANDLERS =====================
+  // ===================== MANIPULADORES DE INTERFACE (UI) =====================
 
   function handleInput() {
     const rawInput = document.getElementById('markdownInput').value;
@@ -727,7 +727,7 @@ Exemplos:
     });
   }
 
-  // ===================== TOAST =====================
+  // ===================== NOTIFICAÇÃO (TOAST) =====================
 
   function showToast(message) {
     const container = document.getElementById('toastContainer');
@@ -738,15 +738,15 @@ Exemplos:
     setTimeout(() => toast.remove(), 2400);
   }
 
-  // ===================== KEYBOARD SHORTCUT =====================
+  // ===================== ATALHOS DE TECLADO =====================
 
   document.addEventListener('keydown', (e) => {
-    // Ctrl+Shift+W = copy WhatsApp
+    // Ctrl+Shift+W = copiar WhatsApp
     if (e.ctrlKey && e.shiftKey && e.key === 'W') {
       e.preventDefault();
       copyOutput('whatsapp');
     }
-    // Ctrl+Shift+G = copy GChat
+    // Ctrl+Shift+G = copiar GChat
     if (e.ctrlKey && e.shiftKey && e.key === 'G') {
       e.preventDefault();
       copyOutput('gchat');
