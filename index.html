@@ -378,6 +378,33 @@
     .badge-wa { background: rgba(37,211,102,0.15); color: var(--whatsapp-green); }
     .badge-gc { background: rgba(26,115,232,0.15); color: var(--gchat-light); }
 
+    /* ===================== NAVEGAÇÃO ===================== */
+    .top-nav {
+      display: flex;
+      justify-content: center;
+      gap: 24px;
+      padding: 20px 0;
+      border-bottom: 1px solid var(--border);
+      margin-bottom: 20px;
+    }
+    .top-nav a {
+      color: var(--text-secondary);
+      text-decoration: none;
+      font-size: 13px;
+      font-weight: 500;
+      transition: color var(--transition);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .top-nav a:hover {
+      color: var(--accent-purple);
+    }
+    .top-nav span {
+      color: var(--border);
+      pointer-events: none;
+    }
+
     /* ===================== RODAPÉ (FOOTER) ===================== */
     footer {
       text-align: center;
@@ -392,6 +419,15 @@
 <div class="bg-glow"></div>
 
 <div class="container">
+
+  <!-- TOP NAVIGATION -->
+  <nav class="top-nav">
+    <a href="https://felipebros.github.io/Codigos/">Página Inicial</a>
+    <span>|</span>
+    <a href="https://felipebros.github.io/markdown-messenger-converter/">Site</a>
+    <span>|</span>
+    <a href="https://github.com/Felipebros/markdown-messenger-converter/">Repositório</a>
+  </nav>
 
   <!-- HEADER -->
   <header>
